@@ -1,0 +1,8 @@
+*.log
+*.swp
+*.bak
+*.tmp
+enc.sh
+enc_opt.sh
+selected_disk.sh
+

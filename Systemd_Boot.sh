@@ -1,0 +1,122 @@
+#!/bin/bash
+
+set -eou pipefail
+
+setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
+source /root/selected_disk.sh
+source /root/enc_opt.sh
+
+sd_boot_mount_option(){
+	rm -rf /boot
+	mount --mkdir -t vfat -o nodev,nosuid,noexec,fmask=0077,dmask=0077 LABEL=EFI /boot
+	systemctl daemon-reload
+	rm -rf /etc/fstab
+	pacman -S arch-install-scripts --noconfirm && wait
+	genfstab -LUp / >> /etc/fstab
+	pacman -Rns arch-install-scripts --noconfirm && wait
+}
+
+install_packages(){
+	cpu_vendor=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
+	if [ "$cpu_vendor" == "GenuineIntel" ]; then
+    		ucode_package="intel-ucode"
+	elif [ "$cpu_vendor" == "AuthenticAMD" ]; then
+    		ucode_package="amd-ucode"
+	fi
+	pacman -Syyu linux linux-headers linux-cachyos linux-cachyos-headers $ucode_package arch-install-scripts btrfs-progs  efibootmgr dosfstools mtools efitools mkinitcpio --noconfirm --needed && wait
+}
+
+c_mkinitcpio(){
+	cp /etc/mkinitcpio.conf /etc/mkinitcpio.conf.bck
+	sed -i "s|^MODULES=.*|MODULES=(btrfs)|g" /etc/mkinitcpio.conf
+	sed -i "s|^BINARIES=.*|BINARIES=(\"/usr/bin/btrfs\")|g" /etc/mkinitcpio.conf
+	sed -i '/#COMPRESSION="lz4"/s/^#//g' /etc/mkinitcpio.conf
+	sed -i "s|^#COMPRESSION_OPTIONS=.*|#COMPRESSION_OPTIONS=(-9)|g" /etc/mkinitcpio.conf
+	sed -i '/#COMPRESSION_OPTIONS=(-9)/s/^#//g' /etc/mkinitcpio.conf
+}
+
+c_luks_mkinitcpio(){
+	sed -i "s|^HOOKS=.*|HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems btrfs fsck)|g" /etc/mkinitcpio.conf
+}
+
+
+sd_boot_entries(){
+	mkdir -p /boot/loader/entries
+cat <<EOF > /boot/loader/entries/arch.conf
+title   Arch Linux
+linux   /vmlinuz-linux-cachyos
+initrd	/initramfs-linux-cachyos.img
+initrd	/$ucode_package.img
+EOF
+
+cat <<EOF > /boot/loader/loader.conf
+default  arch.conf
+timeout  5
+console-mode max
+editor   no
+EOF
+}
+
+
+sd_boot_non_luks(){
+	sd_boot_mount_option
+	echo "systemd-boot kuruluyor..."
+	sleep 2
+	clear
+	install_packages
+	c_mkinitcpio
+	mkinitcpio -P
+	sd_boot_entries
+	BLKID=$(blkid | grep 'LABEL="ArchLinux"' | head -n 1 | cut -d '"' -f 4)
+	echo "options nowatchdog nvme_load=YES zswap.enabled=0 loglevel=3 root=UUID=$BLKID rootflags=subvol=@ rw" >> /boot/loader/entries/arch.conf
+	install_packages
+	bootctl --esp-path=/boot install 
+	bootctl --esp-path=/boot update
+}
+
+
+sd_boot_luks(){
+	sd_boot_mount_option
+	echo "systemd-boot kuruluyor..."
+	sleep 2
+	clear
+	install_packages
+	c_mkinitcpio
+	c_luks_mkinitcpio
+	mkinitcpio -P
+	sd_boot_entries
+	BLKID=$(blkid | grep 'TYPE="crypto_LUKS"' | head -n 1 | cut -d '"' -f 2)
+	echo "options nowatchdog nvme_load=YES zswap.enabled=0 loglevel=3 rd.luks.name=$BLKID=ArchLinux rd.luks.options=discard rootflags=subvol=@ root=/dev/mapper/ArchLinux rw" >> /boot/loader/entries/arch.conf
+	bootctl --esp-path=/boot install
+	bootctl --esp-path=/boot update
+}
+
+if [ "$encrypt_option" == "h" ]; then
+	sd_boot_non_luks
+elif [ "$encrypt_option" == "e" ]; then
+	sd_boot_luks
+fi
+
+clear
+Selamlama.sh
+echo "Sistemler Etkinleştiriliyor..."
+sleep 2
+clear
+Selamlama.sh
+systemctl enable NetworkManager fstrim.timer sshd
+echo "Sistemler Etkinleştirildi."
+
+sleep 2.0
+clear 
+Selamlama.sh
+
+GREEN='\033[1;32m'
+RESET='\033[0m'
+echo "Tüm işlemler tamamlandı."
+sleep 1
+echo -e "${GREEN}Arch Linux kurulumu başarıyla tamamlandı!${RESET}"
+fastfetch
+
+[[ -f /root/enc.sh ]] && rm -rf /root/enc.sh 
+rm /root/enc_opt.sh  /root/selected_disk.sh  /bin/Systemd_Boot.sh /bin/Bootloader.sh /bin/Selamlama.sh /bin/Chroot_Kullanici.sh
+
