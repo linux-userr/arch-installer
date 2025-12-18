@@ -32,7 +32,7 @@ disc_efi(){
   sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
   efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
   mkfs.vfat -F32 -n EFI "$efi_part"
-  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $ 1}')
+  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $1}')
   echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$root_part"
   echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent --force-password open "$root_part" ArchLinux
 }
