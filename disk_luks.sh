@@ -44,7 +44,7 @@ create_disk_no() {
 disc_mbr(){
   echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
   root_no=1
-  echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks1 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$(create_disk_no "$root_no")"
+  echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$(create_disk_no "$root_no")"
   echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --force-password open "$(create_disk_no "$root_no")" ArchLinux
 }
 
