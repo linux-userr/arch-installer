@@ -1,6 +1,6 @@
 #!/bin/bash
-set -e
 
+set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 source /root/selected_disk.sh
 source /root/enc_opt.sh
@@ -43,7 +43,7 @@ crypto_key(){
 	unset PASSWORD
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
 }
 c_grub_prms(){
 	cp /etc/default/grub /etc/default/grub.bck
@@ -62,7 +62,7 @@ c_grub_prms_luks(){
 	chmod 700 /boot
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
 }
 
 c_grub(){
@@ -73,7 +73,7 @@ c_grub(){
 	c_grub_prms
 	sleep 1.5
 	clear
-	Selamlama.sh
+	banner.sh
 	if [[ -d /sys/firmware/efi ]];then
 		mount --mkdir -t vfat -o nodev,nosuid,noexec,dmask=0077,fmask=0077 LABEL=EFI /boot/efi
 		systemctl daemon-reload
@@ -125,17 +125,17 @@ elif [ "$encrypt_option" == "e" ]; then
 	c_grub_luks
 fi
 
-Selamlama.sh
+banner.sh
 echo "Sistemler Etkinleştiriliyor..."
 sleep 2
 clear
-Selamlama.sh
+banner.sh
 systemctl enable NetworkManager fstrim.timer sshd
 echo "Sistemler Etkinleştirildi."
 
 sleep 2.0
 clear 
-Selamlama.sh
+banner.sh
 
 GREEN='\033[1;32m'
 RESET='\033[0m'
@@ -145,4 +145,4 @@ echo -e "${GREEN}Arch Linux kurulumu başarıyla tamamlandı!${RESET}"
 fastfetch
 
 [[ -f /root/enc.sh ]] && rm -rf /root/enc.sh 
-rm /root/enc_opt.sh /bin/Selamlama.sh /root/selected_disk.sh /bin/Grub_Ayari.sh /bin/Bootloader.sh /bin/Chroot_Kullanici.sh
+rm /root/enc_opt.sh /bin/banner.sh /root/selected_disk.sh /bin/grub_setup.sh /bin/bootloader_select.sh /bin/user_setup.sh

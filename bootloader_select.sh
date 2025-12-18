@@ -1,9 +1,7 @@
 #!/bin/bash
 
 set -eou pipefail
-
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
-
 
 [[ -d "/sys/firmware/efi" ]]  && BL_LIST=("grub" "systemd") || BL_LIST=("grub")
 SELECTION=""
@@ -35,10 +33,10 @@ select_bl
 
 case "$SELECTION" in
         "grub")
-                Grub_Ayari.sh
+                grub_setup.sh
                 ;;
         "systemd")
-                Systemd_Boot.sh
+                systemd_boot_setup.sh
                 ;;
         *)
                 echo "Geçersiz seçim."

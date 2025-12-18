@@ -1,7 +1,7 @@
 #!/bin/bash
 
-set -e
 
+set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # IP'den zaman dilimini al
@@ -15,7 +15,7 @@ hwclock --systohc
 while true; do
     sleep 0.5
     clear
-    Selamlama.sh
+    banner.sh
 
     read -p "Yeni hostname'i girin: " new_hostname
 
@@ -52,11 +52,11 @@ sleep 2.5
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 
 clear
-Selamlama.sh
+banner.sh
 locale-gen
 echo 0.5
 clear
-Selamlama.sh
+banner.sh
 
 pacman-key --init && pacman-key --populate && pacman -S archlinux-keyring --noconfirm
 
@@ -89,11 +89,11 @@ wait
 
 pacman -Suuy --noconfirm && wait
 pacman -Syu && wait
-Chroot_Kullanici.sh
+user_setup.sh
 
 sleep 1.5
 
 # mkinitcpio.conf dosyasını düzenleme
-Bootloader.sh
+bootloader_select.sh
 
-rm /bin/Chroot.sh
+rm /bin/chroot_setup.sh

@@ -1,20 +1,20 @@
 #!/bin/bash
 
-set -e
-
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # Kullanıcı adı girişi için döngü
 while true; do
     sleep 0.5
     clear
-    Selamlama.sh
+    banner.sh
     read -p "Yeni kullanıcı adını girin: " username
     if [ ${#username} -lt 1 ]; then
         echo "Hata: Geçersiz kullanıcı adı. Boş bırakılamaz."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
     elif [[ "$username" =~ [^a-zA-Z0-9_] ]]; then
         echo "Hata: Kullanıcı adı yalnızca alfasayısal ve alt çizgi karakterlerinden oluşmalıdır."
     else
@@ -35,7 +35,7 @@ while true; do
         echo "Hata: Şifre boş bırakılamaz! Lütfen geçerli bir şifre girin."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
         continue
     fi
 
@@ -46,7 +46,7 @@ while true; do
         echo "Hata: Parolalar eşleşmiyor. Lütfen tekrar deneyin."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
     else
         break
     fi
@@ -60,7 +60,7 @@ while true; do
         echo "Hata: Şifre boş bırakılamaz! Lütfen geçerli bir şifre girin."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
         continue
     fi
 
@@ -71,7 +71,7 @@ while true; do
         echo "Hata: Parolalar eşleşmiyor. Lütfen tekrar deneyin."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
     else
         break
     fi
@@ -86,7 +86,7 @@ while true; do
         echo "Hatalı giriş! Lütfen sadece 'E' veya 'H' girin."
 	sleep 0.5
 	clear
-	Selamlama.sh
+	banner.sh
     fi
 done
 
@@ -118,4 +118,4 @@ else
 fi
 sleep 0.5
 clear
-Selamlama.sh
+banner.sh

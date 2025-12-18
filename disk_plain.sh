@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -e
-
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # Tüm disk bölümlerini temizle ve BIOS/EFI ve Arch Linux bölümlerini oluştur
 
 disc_efi(){
-  sgdisk --zap-all --clear -n 1:0:+550MiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8300 "$selected_disk"
+  sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
   efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
   mkfs.vfat -F32 -n EFI "$efi_part"
   root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $ 1}') 
@@ -82,7 +82,7 @@ mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,sp
 
 
 clear
-sh /root/Arch_Kurulum/Selamlama.sh
+sh "$SCRIPT_DIR"/banner.sh
 # subvolumeleri listelemek
 btrfs su l /mnt
 
@@ -90,4 +90,4 @@ btrfs su l /mnt
 lsblk -f
 sleep 1.5
 clear
-sh /root/Arch_Kurulum/Selamlama.sh
+sh "$SCRIPT_DIR"/banner.sh

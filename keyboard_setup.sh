@@ -1,6 +1,7 @@
 #!/bin/bash
-source ./Selamlama.sh
-set -e  # Betikte hata oluşursa otomatik çıkış yapar
+
+set -eou pipefail
+source ./banner.sh
 
 # Varsayılan fontu ayarla
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
@@ -35,7 +36,7 @@ while true; do
 		echo "Hatalı giriş! Lütfen 1 veya 2 tuşlarından birini seçin."
 		sleep 0.2
 		clear
-		source ./Selamlama.sh
+		source ./banner.sh
             ;;
     esac
 done
@@ -59,7 +60,7 @@ while true; do
             echo "Hatalı giriş! Lütfen 'E' veya 'H' tuşlarından birini seçin." 
 	    sleep 0.2
 	    clear
-	    source ./Selamlama.sh
+	    source ./banner.sh
 	    ;;
     esac
 done

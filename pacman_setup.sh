@@ -1,11 +1,10 @@
 #!/bin/bash
 
-set -e
-
+set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 #Dosya Yolu
-cp /etc/pacman.conf /etc/pacman.conf.yedek
+cp /etc/pacman.conf /etc/pacman.conf.bck
 
 pacman_conf=/etc/pacman.conf
 sed -i 's/^#UseSyslog/UseSyslog/' $pacman_conf
@@ -25,11 +24,11 @@ for i in {3..1}; do echo -ne "Pacman Konfigüre Ediliyor - Kalan süre: $i\033[0
 clear
 
 # Son olarak, konfigürasyon tamamlandı mesajını göster
-source ./Selamlama.sh
+source ./banner.sh
 echo "Pacman Konfigüre Edildi. "
 sleep 0.5
 clear
-source ./Selamlama.sh
+source ./banner.sh
 
 pacman-key --init
 pacman-key --populate

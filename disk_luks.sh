@@ -1,11 +1,8 @@
 #!/bin/bash
 
-set -e
-
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
-
-# Tüm disk bölümlerini temizle ve EFI ve Arch Linux bölümlerini oluştur
-sgdisk --zap-all --clear -n 1:0:+550MiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
 
 while :; do
     read -s -p "Lütfen şifreyi girin: " password1
@@ -16,23 +13,23 @@ while :; do
     if [[ -z "$password1" ]]; then
 	sleep 0.5
 	clear
-	source ./Selamlama.sh
+	source ./banner.sh
         echo "Şifre boş olamaz! Lütfen geçerli bir şifre girin."
     elif [[ "$password1" != "$password2" ]]; then
 	sleep 0.5
 	clear
-	source ./Selamlama.sh
+	source ./banner.sh
         echo "Şifreler eşleşmiyor! Lütfen tekrar deneyin."
     else
         echo "Şifre başarıyla doğrulandı."
         PASSWORD="$password1"
-	echo "export PASSWORD=$PASSWORD" > /root/Arch_Kurulum/enc.sh
+	echo "export PASSWORD=$PASSWORD" > "$SCRIPT_DIR"/enc.sh
         break
     fi
 done
 
 disc_efi(){
-  sgdisk --zap-all --clear -n 1:0:+550MiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8300 "$selected_disk"
+  sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
   efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
   mkfs.vfat -F32 -n EFI "$efi_part"
   root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $ 1}')
@@ -110,7 +107,7 @@ mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,sp
 mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/home,subvolid=263 LABEL=ArchLinux /mnt/home
 
 clear 
-sh /root/Arch_Kurulum/Selamlama.sh
+sh "$SCRIPT_DIR"/banner.sh
 
 # subvolumeleri listelemek
 btrfs su l /mnt
@@ -119,4 +116,4 @@ btrfs su l /mnt
 lsblk -f
 sleep 1.5
 clear
-sh /root/Arch_Kurulum/Selamlama.sh
+sh "$SCRIPT_DIR"/banner.sh

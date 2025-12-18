@@ -1,7 +1,8 @@
 #!/bin/bash
-source ./Selamlama.sh
 
-set -e  # Hata oluşursa betiği durdur
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source ./banner.sh
 
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
@@ -33,17 +34,16 @@ while :; do
     	read -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
 	selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
 	export selected_disk
-	echo "export selected_disk=$selected_disk" >> /root/Arch_Kurulum/selected_disk.sh
-	chmod +x /root/Arch_Kurulum/selected_disk.sh
-    if [[ -n "$selected_disk" ]]; then
-        echo "Seçilen Disk: $selected_disk"
-        break
-    else
-	sleep 0.5
-	clear
-	source ./Selamlama.sh
-        echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
-    fi
+	echo "export selected_disk=$selected_disk" >> "$SCRIPT_DIR"/selected_disk.sh
+    	if [[ -n "$selected_disk" ]]; then
+		echo "Seçilen Disk: $selected_disk"
+		break
+    	else
+		sleep 0.5
+		clear
+		source ./banner.sh
+	        echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
+	fi
 done
 
 # Disk formatlama
@@ -72,7 +72,7 @@ while :; do
             echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
 	    sleep 1.5
 	    clear
-	    source ./Selamlama.sh
+	    source ./banner.sh
             ;;
     esac
 done
@@ -80,7 +80,7 @@ done
 # Şifreleme seçeneği
 while :; do
     clear
-    source ./Selamlama.sh
+    source ./banner.sh
     read -p "Diski şifrelemek istiyor musunuz? (E/H): " encrypt_option
     encrypt_option=${encrypt_option,,}
     case "$encrypt_option" in
@@ -88,23 +88,23 @@ while :; do
             echo "Disk şifreleme seçildi. Şifreleme işlemi başlıyor..."
             export selected_disk
 	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > /root/Arch_Kurulum/enc_opt.sh
-	    ./Sifreli_Disk_Opsiyonu.sh "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!"
+	    echo "export encrypt_option=$encrypt_option" > "$SCRIPT_DIR"/enc_opt.sh
+	    ./disk_luks.sh "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!"
             break
             ;;
         h)
             echo "Şifreleme seçilmedi. Devam ediliyor..."
             export selected_disk
 	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > /root/Arch_Kurulum/enc_opt.sh
-	    ./Sifresiz_Disk_Opsiyonu.sh "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
+	    echo "export encrypt_option=$encrypt_option" > "$SCRIPT_DIR"/enc_opt.sh
+	    ./disk_plain.sh "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
             break
             ;;
         *)
 	    echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
 	    sleep 1.5
 	    clear
-	    source ./Selamlama.sh
+	    source ./banner.sh
             ;;
     esac
 done

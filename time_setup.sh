@@ -1,7 +1,8 @@
 #!/bin/bash
-source ./Selamlama.sh
-set -e
 
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+./banner.sh
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # IP'den zaman dilimini al
@@ -16,4 +17,4 @@ timedatectl set-ntp 1
 timedatectl set-timezone $timezone
 
 # Saati göstermek
-timedatectl status && sleep 2.1 && clear && source ./Selamlama.sh && date && sleep 1.2 && echo "Saat Dilimi $timezone Olarak Ayarlandı. " && sleep 2.0 && clear
+timedatectl status && sleep 2.1 && clear && source ./banner.sh && date && sleep 1.2 && echo "Saat Dilimi $timezone Olarak Ayarlandı. " && sleep 2.0 && clear

@@ -1,21 +1,21 @@
 #!/bin/bash
 
-set -e
-
+set -eou pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 clear 
 # Saat Ayarı 
-./Saat_Ayari.sh
+./time_setup.sh
 
 # Klavye Ayarı
-./Klavye_Duzeni.sh
+./keyboard_setup.sh
 
 #Disk Ayarı
-./Disk_Ayari.sh
+./disk_setup.sh
 
 #Pacman Ayarı
-./Pacman_Ayari.sh
+./pacman_setup.sh
 
 # Pacstrap Ayarı
-./Pacstrap_Ayari.sh
+./base_install.sh
