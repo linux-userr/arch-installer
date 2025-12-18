@@ -44,7 +44,7 @@ fi
 
 rm -rf "$SCRIPT_DIR"/enc_opt.sh "$SCRIPT_DIR"/selected_disk.sh
 
-if [[ -f "$SCIPT_DIR"/enc.sh ]];then
+if [[ -f "$SCRIPT_DIR"/enc.sh ]];then
 	rm -rf "$SCRIPT_DIR"/enc.sh
 fi
 umount -R /mnt 
