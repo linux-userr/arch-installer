@@ -42,4 +42,9 @@ if [[ ! -f /mnt/bin/grub-mkconfig ]];then
 	bootctl --esp-path=/mnt/boot install
 fi
 
+rm -rf "$SCRIPT_DIR"/enc_opt.sh "$SCRIPT_DIR"/selected_disk.sh
+
+if [[ -f "$SCIPT_DIR"/enc.sh ]];then
+	rm -rf "$SCRIPT_DIR"/enc.sh
+fi
 umount -R /mnt 
