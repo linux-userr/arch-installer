@@ -71,15 +71,13 @@ cd
 umount /mnt
 
 # /mnt dizinini Pacstrap kısmına hazırlamak için subvollerin ve subvolidlerin mount edilmesi
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@,subvolid=256 LABEL=ArchLinux /mnt
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/var,subvolid=257 LABEL=ArchLinux /mnt/var
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/usr/local,subvolid=258 LABEL=ArchLinux /mnt/usr/local
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/srv,subvolid=259 LABEL=ArchLinux /mnt/srv
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/root,subvolid=260 LABEL=ArchLinux /mnt/root
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/opt,subvolid=261 LABEL=ArchLinux /mnt/opt
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/tmp,subvolid=262 LABEL=ArchLinux /mnt/tmp
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/home,subvolid=263 LABEL=ArchLinux /mnt/home
-
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@ LABEL=ArchLinux /mnt
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/var LABEL=ArchLinux /mnt/var
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/usr/local LABEL=ArchLinux /mnt/usr/local
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/srv LABEL=ArchLinux /mnt/srv
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/root LABEL=ArchLinux /mnt/root
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/opt LABEL=ArchLinux /mnt/opt
+mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/home LABEL=ArchLinux /mnt/home
 
 clear
 sh "$SCRIPT_DIR"/banner.sh
