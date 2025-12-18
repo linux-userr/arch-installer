@@ -10,7 +10,7 @@ disc_efi(){
   sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
   efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
   mkfs.vfat -F32 -n EFI "$efi_part"
-  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $ 1}') 
+  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $1}') 
   mkfs.btrfs -f -L ArchLinux "$root_part"
 }
 
