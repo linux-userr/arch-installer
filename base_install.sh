@@ -20,14 +20,11 @@ genfstab -LUp /mnt >> /mnt/etc/fstab
 cp "$SCRIPT_DIR"/banner.sh /mnt/bin
 cp "$SCRIPT_DIR"/chroot_setup.sh /mnt/bin
 cp "$SCRIPT_DIR"/user_setup.sh /mnt/bin
-cp "$SCRIPT_DIR"/enc_opt.sh /mnt/root
+cp /run/enc_opt.sh /mnt/run/
 
-if [ -f "$SCRIPT_DIR"/enc.sh ];then
-	cp "$SCRIPT_DIR"/enc.sh /mnt/root
-else
-	echo
-fi
-cp "$SCRIPT_DIR"/selected_disk.sh /mnt/root/
+[[ -f /run/enc.sh ]] && cp /run/enc.sh /mnt/run/
+
+cp /run/selected_disk.sh /mnt/run/
 cp "$SCRIPT_DIR"/bootloader_select.sh /mnt/bin/
 cp "$SCRIPT_DIR"/systemd_boot_setup.sh /mnt/bin/
 cp "$SCRIPT_DIR"/grub_setup.sh /mnt/bin/
@@ -42,9 +39,4 @@ if [[ ! -f /mnt/bin/grub-mkconfig ]];then
 	bootctl --esp-path=/mnt/boot install
 fi
 
-rm -rf "$SCRIPT_DIR"/enc_opt.sh "$SCRIPT_DIR"/selected_disk.sh
-
-if [[ -f "$SCRIPT_DIR"/enc.sh ]];then
-	rm -rf "$SCRIPT_DIR"/enc.sh
-fi
 umount -R /mnt 

@@ -34,7 +34,7 @@ while :; do
     	read -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
 	selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
 	export selected_disk
-	echo "export selected_disk=$selected_disk" >> "$SCRIPT_DIR"/selected_disk.sh
+	echo "export selected_disk=$selected_disk" >> /run/selected_disk.sh
     	if [[ -n "$selected_disk" ]]; then
 		echo "Seçilen Disk: $selected_disk"
 		break
@@ -42,7 +42,7 @@ while :; do
 		sleep 0.5
 		clear
 		source ./banner.sh
-	        echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
+		echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
 	fi
 done
 
@@ -88,7 +88,7 @@ while :; do
             echo "Disk şifreleme seçildi. Şifreleme işlemi başlıyor..."
             export selected_disk
 	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > "$SCRIPT_DIR"/enc_opt.sh
+	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
 	    ./disk_luks.sh "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!"
             break
             ;;
@@ -96,7 +96,7 @@ while :; do
             echo "Şifreleme seçilmedi. Devam ediliyor..."
             export selected_disk
 	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > "$SCRIPT_DIR"/enc_opt.sh
+	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
 	    ./disk_plain.sh "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
             break
             ;;
@@ -108,4 +108,6 @@ while :; do
             ;;
     esac
 done
+
+chmod 600 /run/selected_disk.sh /run/enc_opt.sh
 

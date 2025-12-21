@@ -2,10 +2,10 @@
 
 set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
-source /root/selected_disk.sh
-source /root/enc_opt.sh
+source /run/selected_disk.sh
+source /run/enc_opt.sh
 
-[[ -f "/root/enc.sh" ]] && source /root/enc.sh
+[[ -f "/run/enc.sh" ]] && source /run/enc.sh
 
 install_packages(){
 	cpu_vendor=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
@@ -40,7 +40,6 @@ crypto_key(){
 	head -c 64 /dev/urandom > /root/secrets/crypto_keyfile.bin && chmod 600 /root/secrets/crypto_keyfile.bin
 	DISK=$(blkid | grep 'TYPE="crypto_LUKS"' | awk -F: '{print $1}')
 	echo "$PASSWORD" | cryptsetup --force-password -v luksAddKey -i 1 "$DISK" /root/secrets/crypto_keyfile.bin
-	unset PASSWORD
 	sleep 0.5
 	clear
 	banner.sh
@@ -137,12 +136,16 @@ sleep 2.0
 clear 
 banner.sh
 
+unset PASSWORD encrypt_option selected_disk
+shred -u -n 3 /run/selected_disk.sh /run/enc_opt.sh
+
+[[ -f /run/enc.sh ]] && shred -u -n 3 /run/enc.sh
+
+rm -rf /bin/banner.sh /bin/grub_setup.sh /bin/bootloader_select.sh /bin/user_setup.sh
+
 GREEN='\033[1;32m'
 RESET='\033[0m'
 echo "Tüm işlemler tamamlandı."
 sleep 1
 echo -e "${GREEN}Arch Linux kurulumu başarıyla tamamlandı!${RESET}"
 fastfetch
-
-[[ -f /root/enc.sh ]] && rm -rf /root/enc.sh 
-rm /root/enc_opt.sh /bin/banner.sh /root/selected_disk.sh /bin/grub_setup.sh /bin/bootloader_select.sh /bin/user_setup.sh

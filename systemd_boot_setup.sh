@@ -2,8 +2,6 @@
 
 set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
-source /root/selected_disk.sh
-source /root/enc_opt.sh
 
 sd_boot_mount_option(){
 	rm -rf /boot
@@ -109,6 +107,14 @@ sleep 2.0
 clear 
 banner.sh
 
+unset PASSWORD selected_disk encrypt_option
+
+shred -u -n 3 /run/selected_disk.sh /run/enc_opt.sh
+
+if [[ -f /run/enc.sh ]] && shred -u -n 3 /run/enc.sh
+
+rm -rf /bin/systemd_boot_setup.sh /bin/bootloader_select.sh /bin/banner.sh /bin/user_setup.sh
+
 GREEN='\033[1;32m'
 RESET='\033[0m'
 echo "Tüm işlemler tamamlandı."
@@ -116,6 +122,4 @@ sleep 1
 echo -e "${GREEN}Arch Linux kurulumu başarıyla tamamlandı!${RESET}"
 fastfetch
 
-[[ -f /root/enc.sh ]] && rm -rf /root/enc.sh 
-rm /root/enc_opt.sh  /root/selected_disk.sh  /bin/systemd_boot_setup.sh /bin/bootloader_select.sh /bin/banner.sh /bin/user_setup.sh
 

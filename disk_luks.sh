@@ -23,7 +23,7 @@ while :; do
     else
         echo "Şifre başarıyla doğrulandı."
         PASSWORD="$password1"
-	echo "export PASSWORD=$PASSWORD" > "$SCRIPT_DIR"/enc.sh
+	echo "export PASSWORD=$PASSWORD" > /run/enc.sh
         break
     fi
 done
