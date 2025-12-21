@@ -112,7 +112,7 @@ unset PASSWORD selected_disk encrypt_option
 
 shred -u -n 3 /run/selected_disk.sh /run/enc_opt.sh
 
-if [[ -f /run/enc.sh ]] && shred -u -n 3 /run/enc.sh
+[[ -f /run/enc.sh ]] && shred -u -n 3 /run/enc.sh
 
 rm -rf /bin/systemd_boot_setup.sh /bin/bootloader_select.sh /bin/banner.sh /bin/user_setup.sh
 
