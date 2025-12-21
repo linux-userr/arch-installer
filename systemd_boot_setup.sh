@@ -2,6 +2,7 @@
 
 set -eou pipefail
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
+source /run/enc_opt.sh
 
 sd_boot_mount_option(){
 	rm -rf /boot
@@ -121,5 +122,3 @@ echo "Tüm işlemler tamamlandı."
 sleep 1
 echo -e "${GREEN}Arch Linux kurulumu başarıyla tamamlandı!${RESET}"
 fastfetch
-
-
