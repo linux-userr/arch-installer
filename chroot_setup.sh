@@ -97,7 +97,8 @@ Include = /etc/pacman.d/chaotic-mirrorlist
 EOF
 fi
 
-pacman -Sy --noconfirm
+# Yeni repolarla birlikte tüm sistemi ve veritabanlarını güncelle
+pacman -Syyu --noconfirm
 
 # --- 6. Paket Kurulumu ---
 echo ">> Sistem paketleri kuruluyor..."
