@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -eou pipefail
+set -Eeuo pipefail
+IFS=$'\n\t'
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 source /run/selected_disk.sh
 source /run/enc_opt.sh

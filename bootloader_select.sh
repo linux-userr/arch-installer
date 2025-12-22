@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -eou pipefail
+set -Eeuo pipefail
+IFS=$'\n\t'
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 [[ -d "/sys/firmware/efi" ]]  && BL_LIST=("grub" "systemd") || BL_LIST=("grub")

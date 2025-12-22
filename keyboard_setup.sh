@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -eou pipefail
+set -Eeuo pipefail
+IFS=$'\n\t'
 source ./banner.sh
 
 # Varsayılan fontu ayarla

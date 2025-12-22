@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -eou pipefail
+set -Eeuo pipefail
+IFS=$'\n\t'
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ./banner.sh
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
