@@ -8,11 +8,22 @@ setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 # Tüm disk bölümlerini temizle ve BIOS/EFI ve Arch Linux bölümlerini oluştur
 
 disc_efi(){
-  sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
-  efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
-  mkfs.vfat -F32 -n EFI "$efi_part"
-  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $1}') 
-  mkfs.btrfs -f -L ArchLinux "$root_part"
+    sgdisk --zap-all --clear \
+        -n 1:0:+1GiB -c 1:EFI -t 1:ef00 \
+        -n 2:0:0 -c 2:ArchLinux -t 2:8300 "$selected_disk"
+
+    partprobe "$selected_disk"
+    udevadm settle
+
+    root_part=$(blkid -t PARTLABEL="ArchLinux" -o device "$selected_disk"*)
+    efi_part=$(blkid -t PARTLABEL="EFI" -o device "$selected_disk"*)
+
+    if [[ -z "$root_part" ]]; then echo "Hata: Root partition bulunamadı!"; exit 1; fi
+
+    mkfs.vfat -F32 -n EFI "$efi_part"
+
+    mkfs.btrfs -f -L ArchLinux /dev/mapper/ArchLinux
+
 }
 
 create_disk_no() {
