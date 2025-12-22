@@ -126,7 +126,7 @@ sleep 2.0
 clear 
 banner.sh
 
-unset PASSWORD encrypt_option selected_disk
+unset encrypt_option selected_disk
 shred -u -n 3 /run/selected_disk.sh /run/enc_opt.sh
 
 rm -rf /bin/banner.sh /bin/grub_setup.sh /bin/bootloader_select.sh /bin/user_setup.sh
