@@ -45,4 +45,7 @@ if [[ ! -f /mnt/usr/bin/grub-mkconfig ]];then
 	bootctl --esp-path=/mnt/boot install
 fi
 
+shred -u -n 3 /root/secrets/crypto_keyfile.bin
+rm -rf /root/secrets
+
 umount -R /mnt 
