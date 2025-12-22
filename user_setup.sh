@@ -93,8 +93,7 @@ done
 
 # Evet seçeneği seçilirse
 if [[ "$root_access" =~ ^[Ee]$ ]]; then
-    sed -i '/^#\s*%wheel\s*ALL=(ALL:ALL)\s*ALL/s/^#\s*//' /etc/sudoers
-    echo "Defaults rootpw" >> /etc/sudoers
+    sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
     echo "Kullanıcıya root yetkisi verildi."
 else
     echo "Kullanıcıya root yetkisi verilmedi."
