@@ -24,29 +24,53 @@ while :; do
     else
         echo "Şifre başarıyla doğrulandı."
         PASSWORD="$password1"
-	echo "export PASSWORD=$PASSWORD" > /run/enc.sh
         break
     fi
 done
 
 disc_efi(){
-  sgdisk --zap-all --clear -n 1:0:+1GiB -c 1:EFI -t 1:ef00 -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
-  efi_part=$(blkid | grep 'LABEL="EFI"' | awk -F: '{print $1}')
-  mkfs.vfat -F32 -n EFI "$efi_part"
-  root_part=$(blkid | grep 'LABEL="ArchLinux"' | awk -F: '{print $1}')
-  echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$root_part"
-  echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent --force-password open "$root_part" ArchLinux
+    sgdisk --zap-all --clear \
+        -n 1:0:+1GiB -c 1:EFI -t 1:ef00 \
+        -n 2:0:0 -c 2:ArchLinux -t 2:8309 "$selected_disk"
+
+    partprobe "$selected_disk"
+    udevadm settle
+
+    root_part=$(blkid -t PARTLABEL="ArchLinux" -o device "$selected_disk"*)
+    efi_part=$(blkid -t PARTLABEL="EFI" -o device "$selected_disk"*)
+
+    if [[ -z "$root_part" ]]; then echo "Hata: Root partition bulunamadı!"; exit 1; fi
+
+    mkfs.vfat -F32 -n EFI "$efi_part"
+
+    echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$root_part"
+    echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --persistent --force-password open "$root_part" ArchLinux
+
+    mkfs.btrfs -f -L ArchLinux /dev/mapper/ArchLinux
+    
+    mkdir -p /root/secrets && chmod 700 /root/secrets
+    head -c 64 /dev/urandom > /root/secrets/crypto_keyfile.bin && chmod 600 /root/secrets/crypto_keyfile.bin
+    
+    echo -n "$PASSWORD" | cryptsetup -v luksAddKey "$root_part" /root/secrets/crypto_keyfile.bin
 }
 
+
 create_disk_no() {
-  echo "$selected_disk$([[ "$selected_disk" == *"nvme"* ]] && echo p)$1"
+    echo "$selected_disk$([[ "$selected_disk" == *"nvme"* ]] && echo p)$1"
 }
 
 disc_mbr(){
-  echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
-  root_no=1
-  echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$(create_disk_no "$root_no")"
-  echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --force-password open "$(create_disk_no "$root_no")" ArchLinux
+    echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
+    root_no=1
+    local root_p=$(create_disk_no "$root_no")
+    echo -n "$PASSWORD" | cryptsetup luksFormat --perf-no_read_workqueue --perf-no_write_workqueue --type luks2 --use-random --verify-passphrase --cipher aes-xts-plain64 -S 1 -s 512 -h sha512 -i 2000 --pbkdf pbkdf2 --force-password "$root_p"
+    echo -n "$PASSWORD" | cryptsetup --allow-discards --perf-no_read_workqueue --perf-no_write_workqueue --force-password open "$root_p" ArchLinux
+
+    mkfs.btrfs -f -L ArchLinux /dev/mapper/ArchLinux 
+
+    mkdir -p /root/secrets && chmod 700 /root/secrets
+    head -c 64 /dev/urandom > /root/secrets/crypto_keyfile.bin && chmod 600 /root/secrets/crypto_keyfile.bin
+    echo -n "$PASSWORD" | cryptsetup -v luksAddKey "$root_p" /root/secrets/crypto_keyfile.bin
 }
 
 if [[ -d /sys/firmware/efi ]]; then
@@ -55,9 +79,6 @@ else
   disc_mbr
 fi
 
-mkfs.btrfs -f -L ArchLinux /dev/mapper/ArchLinux
-
-partprobe "$selected_disk"
 
 # Biçimlendirilmiş Btfs partitionunu subvolleri oluşturmak için mount etmek
 mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120 LABEL=ArchLinux /mnt
