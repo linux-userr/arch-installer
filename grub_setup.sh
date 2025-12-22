@@ -6,8 +6,6 @@ setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 source /run/selected_disk.sh
 source /run/enc_opt.sh
 
-[[ -f "/run/enc.sh" ]] && source /run/enc.sh
-
 install_packages(){
 	cpu_vendor=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')
 	if [ "$cpu_vendor" == "GenuineIntel" ]; then
@@ -36,15 +34,7 @@ c_luks_mkinitcpio(){
 	sed -i "s|^FILES=.*|FILES=(/root/secrets/crypto_keyfile.bin)|g" /etc/mkinitcpio.conf
 }
 
-crypto_key(){
-	mkdir /root/secrets && chmod 700 /root/secrets
-	head -c 64 /dev/urandom > /root/secrets/crypto_keyfile.bin && chmod 600 /root/secrets/crypto_keyfile.bin
-	DISK=$(blkid | grep 'TYPE="crypto_LUKS"' | awk -F: '{print $1}')
-	echo "$PASSWORD" | cryptsetup --force-password -v luksAddKey -i 1 "$DISK" /root/secrets/crypto_keyfile.bin
-	sleep 0.5
-	clear
-	banner.sh
-}
+
 c_grub_prms(){
 	cp /etc/default/grub /etc/default/grub.bck
 	new_params="nowatchdog nvme_load=YES zswap.enabled=0 loglevel=3"
@@ -78,7 +68,7 @@ c_grub(){
 		mount --mkdir -t vfat -o nodev,nosuid,noexec,dmask=0077,fmask=0077 LABEL=EFI /boot/efi
 		systemctl daemon-reload
 		rm -rf /etc/fstab
-		genfstab -LUp / >> /etc/fstab
+		genfstab -LUp / > /etc/fstab
 		pacman -Rns arch-install-scripts --noconfirm && wait
 		grub-install --target x86_64-efi --efi-directory /boot/efi --boot-directory /boot
 		grub-mkconfig -o /boot/grub/grub.cfg
@@ -95,7 +85,6 @@ c_grub_luks(){
 	echo "Grub kuruluyor... "
 	install_packages
 	c_mkinitcpio
-	crypto_key
 	c_luks_mkinitcpio
 	mkinitcpio -P
 	c_grub_prms
@@ -104,7 +93,7 @@ c_grub_luks(){
 		mount --mkdir -t vfat -o nodev,nosuid,noexec,dmask=0077,fmask=0077 LABEL=EFI /boot/efi
 		systemctl daemon-reload
 		rm -rf /etc/fstab
-		genfstab -LUp / >> /etc/fstab
+		genfstab -LUp / > /etc/fstab
 		pacman -Rns arch-install-scripts --noconfirm && wait
 		grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot --modules="${GRUB_MODULES}" --disable-shim-lock
 		grub-mkconfig -o /boot/grub/grub.cfg
@@ -139,8 +128,6 @@ banner.sh
 
 unset PASSWORD encrypt_option selected_disk
 shred -u -n 3 /run/selected_disk.sh /run/enc_opt.sh
-
-[[ -f /run/enc.sh ]] && shred -u -n 3 /run/enc.sh
 
 rm -rf /bin/banner.sh /bin/grub_setup.sh /bin/bootloader_select.sh /bin/user_setup.sh
 
