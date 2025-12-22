@@ -24,8 +24,6 @@ cp "$SCRIPT_DIR"/chroot_setup.sh /mnt/bin
 cp "$SCRIPT_DIR"/user_setup.sh /mnt/bin
 cp /run/enc_opt.sh /mnt/run/
 
-[[ -f /run/enc.sh ]] && cp /run/enc.sh /mnt/run/
-
 cp /run/selected_disk.sh /mnt/run/
 cp "$SCRIPT_DIR"/bootloader_select.sh /mnt/bin/
 cp "$SCRIPT_DIR"/systemd_boot_setup.sh /mnt/bin/
@@ -33,11 +31,11 @@ cp "$SCRIPT_DIR"/grub_setup.sh /mnt/bin/
 cp /etc/vconsole.conf	/mnt/etc/vconsole.conf
 arch-chroot /mnt /usr/bin/zsh -c "chroot_setup.sh"
 
-if [[ -f /mnt/bin/grub_setup.sh ]];then
-	rm /mnt/bin/grub_setup.sh
+if [[ -f /mnt/usr/bin/grub_setup.sh ]];then
+	rm /mnt/usr/bin/grub_setup.sh
 fi
 
-if [[ ! -f /mnt/bin/grub-mkconfig ]];then
+if [[ ! -f /mnt/usr/bin/grub-mkconfig ]];then
 	bootctl --esp-path=/mnt/boot install
 fi
 
