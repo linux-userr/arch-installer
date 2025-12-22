@@ -35,7 +35,7 @@ while :; do
     	read -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
 	selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
 	export selected_disk
-	echo "export selected_disk=$selected_disk" >> /run/selected_disk.sh
+	echo "export selected_disk=$selected_disk" > /run/selected_disk.sh
     	if [[ -n "$selected_disk" ]]; then
 		echo "Seçilen Disk: $selected_disk"
 		break
