@@ -24,6 +24,12 @@ cp "$SCRIPT_DIR"/chroot_setup.sh /mnt/bin
 cp "$SCRIPT_DIR"/user_setup.sh /mnt/bin
 cp /run/enc_opt.sh /mnt/run/
 
+if [[ -d /root/secrets ]]; then
+    mkdir -p /mnt/root/secrets
+    cp -r /root/secrets/* /mnt/root/secrets/
+    chmod 700 /mnt/root/secrets
+fi
+
 cp /run/selected_disk.sh /mnt/run/
 cp "$SCRIPT_DIR"/bootloader_select.sh /mnt/bin/
 cp "$SCRIPT_DIR"/systemd_boot_setup.sh /mnt/bin/
