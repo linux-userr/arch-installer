@@ -22,7 +22,7 @@ disc_efi(){
 
     mkfs.vfat -F32 -n EFI "$efi_part"
 
-    mkfs.btrfs -f -L ArchLinux /dev/mapper/ArchLinux
+    mkfs.btrfs -f -L ArchLinux "$root_part"
 
 }
 
