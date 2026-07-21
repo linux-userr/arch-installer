@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 IFS=$'\n\t'
-source ./banner.sh
+show_banner
 
 # Varsayılan fontu ayarla
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
@@ -37,7 +37,7 @@ while true; do
 		echo "Hatalı giriş! Lütfen 1 veya 2 tuşlarından birini seçin."
 		sleep 0.2
 		clear
-		source ./banner.sh
+		show_banner
             ;;
     esac
 done
@@ -61,7 +61,7 @@ while true; do
             echo "Hatalı giriş! Lütfen 'E' veya 'H' tuşlarından birini seçin." 
 	    sleep 0.2
 	    clear
-	    source ./banner.sh
+	    show_banner
 	    ;;
     esac
 done

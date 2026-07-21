@@ -2,7 +2,6 @@
 
 set -Eeuo pipefail
 IFS=$'\n\t'
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # Tüm disk bölümlerini temizle ve BIOS/EFI ve Arch Linux bölümlerini oluştur
@@ -92,7 +91,7 @@ mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,sp
 mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/home LABEL=ArchLinux /mnt/home
 
 clear
-sh "$SCRIPT_DIR"/banner.sh
+show_banner
 # subvolumeleri listelemek
 btrfs su l /mnt
 
@@ -100,4 +99,4 @@ btrfs su l /mnt
 lsblk -f
 sleep 1.5
 clear
-sh "$SCRIPT_DIR"/banner.sh
+show_banner

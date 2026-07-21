@@ -2,8 +2,7 @@
 
 set -Eeuo pipefail
 IFS=$'\n\t'
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source ./banner.sh
+show_banner
 
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
@@ -42,7 +41,7 @@ while :; do
     	else
 		sleep 0.5
 		clear
-		source ./banner.sh
+		show_banner
 		echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
 	fi
 done
@@ -73,7 +72,7 @@ while :; do
             echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
 	    sleep 1.5
 	    clear
-	    source ./banner.sh
+	    show_banner
             ;;
     esac
 done
@@ -81,7 +80,7 @@ done
 # Şifreleme seçeneği
 while :; do
     clear
-    source ./banner.sh
+    show_banner
     read -p "Diski şifrelemek istiyor musunuz? (E/H): " encrypt_option
     encrypt_option=${encrypt_option,,}
     case "$encrypt_option" in
@@ -90,7 +89,7 @@ while :; do
             export selected_disk
 	    export encrypt_option
 	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
-	    ./disk_luks.sh "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!"
+	    source "${DISK_DIR}/disk_luks.sh" "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!" 
             break
             ;;
         h)
@@ -98,14 +97,14 @@ while :; do
             export selected_disk
 	    export encrypt_option
 	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
-	    ./disk_plain.sh "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
+	    source "${DISK_DIR}/disk_plain.sh" "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
             break
             ;;
         *)
 	    echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
 	    sleep 1.5
 	    clear
-	    source ./banner.sh
+	    show_banner
             ;;
     esac
 done
