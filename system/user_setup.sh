@@ -11,7 +11,7 @@ while true; do
     sleep 0.5
     clear
     banner.sh
-    read -p "Yeni kullanıcı adını girin: " username
+    read -r -p "Yeni kullanıcı adını girin: " username
     if [ ${#username} -lt 1 ]; then
         echo "Hata: Geçersiz kullanıcı adı. Boş bırakılamaz."
         sleep 0.5
@@ -35,7 +35,7 @@ while true; do
 done
 
 while true; do
-    read -s -p "Kullanıcı şifresini girin: " user_password
+    read -r -s -p "Kullanıcı şifresini girin: " user_password
     echo
     if [ -z "$user_password" ]; then
         echo "Hata: Şifre boş bırakılamaz! Lütfen geçerli bir şifre girin."
@@ -45,7 +45,7 @@ while true; do
         continue
     fi
 
-    read -s -p "Şifreyi tekrar girin: " user_password_confirm
+    read -r -s -p "Şifreyi tekrar girin: " user_password_confirm
     echo
     if [ "$user_password" != "$user_password_confirm" ]; then
         echo "Hata: Parolalar eşleşmiyor. Lütfen tekrar deneyin."
@@ -58,7 +58,7 @@ while true; do
 done
 
 while true; do
-    read -s -p "Root şifresini girin: " root_password
+    read -r -s -p "Root şifresini girin: " root_password
     echo
     if [ -z "$root_password" ]; then
         echo "Hata: Şifre boş bırakılamaz! Lütfen geçerli bir şifre girin."
@@ -68,7 +68,7 @@ while true; do
         continue
     fi
 
-    read -s -p "Şifreyi tekrar girin: " root_password_confirm
+    read -r -s -p "Şifreyi tekrar girin: " root_password_confirm
     echo
     if [ "$root_password" != "$root_password_confirm" ]; then
         echo "Hata: Parolalar eşleşmiyor. Lütfen tekrar deneyin."
@@ -81,7 +81,7 @@ while true; do
 done
 
 while true; do
-    read -p "Kullanıcıya root yetkisi verilsin mi? (E/H): " root_access
+    read -r -p "Kullanıcıya root yetkisi verilsin mi? (E/H): " root_access
     if [[ "$root_access" =~ ^[EeHh]$ ]]; then
         break
     else

@@ -3,8 +3,13 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
+# shellcheck source=/dev/null
 source /run/selected_disk.sh
+# shellcheck source=/dev/null
 source /run/enc_opt.sh
+
+: "${selected_disk:=}"
+: "${encrypt_option:=}"
 
 install_packages(){
 	cpu_vendor=$(grep vendor_id /proc/cpuinfo | awk 'NR==1{print $3}')

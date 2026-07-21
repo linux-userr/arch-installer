@@ -11,12 +11,12 @@ setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 timezone=$(curl -s https://ipinfo.io/timezone)
 
 # Zaman dilimini kullanarak saat dilimini ayarla
-ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime
 hwclock -uw
 
 # Ntp etkinleştirmek
 timedatectl set-ntp 1
-timedatectl set-timezone $timezone
+timedatectl set-timezone "$timezone"
 
 # Saati göstermek
 timedatectl status && sleep 2.1 && clear && show_banner && date && sleep 1.2 && echo "Saat Dilimi $timezone Olarak Ayarlandı. " && sleep 2.0 && clear

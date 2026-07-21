@@ -36,7 +36,7 @@ hwclock --systohc
 # --- 2. Hostname (Makine Adı) Yapılandırması ---
 while true; do
     echo ""
-    read -p "Yeni hostname'i girin: " new_hostname
+    read -r -p "Yeni hostname'i girin: " new_hostname
 
     # RFC 1123 Uyumluluk Kontrolü:
     # 1. Uzunluk 1-63 karakter arası

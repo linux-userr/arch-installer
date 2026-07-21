@@ -31,7 +31,7 @@ echo "$disks" | nl -s ') '
 
 # Disk seçimi
 while :; do
-    	read -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
+    	read -r -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
 	selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
 	export selected_disk
 	echo "export selected_disk=$selected_disk" > /run/selected_disk.sh
@@ -48,7 +48,7 @@ done
 
 # Disk formatlama
 while :; do
-    read -p "Diski formatlamak istiyor musunuz? (E/H): " format_option
+    read -r -p "Diski formatlamak istiyor musunuz? (E/H): " format_option
     case "$format_option" in
         [Ee])
             echo "Disk formatlama işlemi başlatılıyor..."
@@ -64,8 +64,7 @@ while :; do
             ;;
         [Hh])
             echo "Disk formatlama işlemi iptal edildi."
-            exit 42
-	    break
+            exit 42 
             ;;
         *)
 	    echo "Seçilen Disk: $selected_disk"
@@ -81,7 +80,7 @@ done
 while :; do
     clear
     show_banner
-    read -p "Diski şifrelemek istiyor musunuz? (E/H): " encrypt_option
+    read -r -p "Diski şifrelemek istiyor musunuz? (E/H): " encrypt_option
     encrypt_option=${encrypt_option,,}
     case "$encrypt_option" in
         e)
@@ -89,6 +88,7 @@ while :; do
             export selected_disk
 	    export encrypt_option
 	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
+	    # shellcheck source=/dev/null
 	    source "${DISK_DIR}/disk_luks.sh" "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!" 
             break
             ;;
@@ -97,6 +97,7 @@ while :; do
             export selected_disk
 	    export encrypt_option
 	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
+	    # shellcheck source=/dev/null
 	    source "${DISK_DIR}/disk_plain.sh" "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
             break
             ;;

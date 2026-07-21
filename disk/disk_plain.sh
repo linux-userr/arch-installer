@@ -4,7 +4,15 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
-# Tüm disk bölümlerini temizle ve BIOS/EFI ve Arch Linux bölümlerini oluştur
+# Selected disk kontrolü
+selected_disk="${1:-${selected_disk:-}}"
+if [[ -z "$selected_disk" ]]; then
+    echo "Hata: Kurulum yapılacak disk belirtilmedi!" >&2
+    exit 1
+fi
+
+LABEL="ArchLinux"
+OPTS="defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120"
 
 disc_efi(){
     sgdisk --zap-all --clear \
@@ -20,82 +28,49 @@ disc_efi(){
     if [[ -z "$root_part" ]]; then echo "Hata: Root partition bulunamadı!"; exit 1; fi
 
     mkfs.vfat -F32 -n EFI "$efi_part"
-
-    mkfs.btrfs -f -L ArchLinux "$root_part"
-
+    mkfs.btrfs -f -L "$LABEL" "$root_part"
 }
 
 create_disk_no() {
-  echo "$selected_disk$([[ "$selected_disk" == *"nvme"* ]] && echo p)$1"
+    echo "$selected_disk$([[ "$selected_disk" == *"nvme"* ]] && echo p)$1"
 }
 
 disc_mbr(){
-  echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
-  root_no=1
-  mkfs.btrfs -f -L ArchLinux "$(create_disk_no "$root_no")"
+    echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
+    root_no=1
+    mkfs.btrfs -f -L "$LABEL" "$(create_disk_no "$root_no")"
 }
 
 if [[ -d /sys/firmware/efi ]]; then
-  disc_efi
+    disc_efi
 else
-  disc_mbr
+    disc_mbr
 fi
 
-	
-# EFI ve Arch Linux bölümlerini oluştur
-# Biçimlendirilmiş Btfs partitionunu subvolleri oluşturmak için mount etmek
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120 LABEL=ArchLinux /mnt
+SUBVOLS=( "@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/tmp" "@/home" )
+MOUNT_SUBVOLS=( "@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/home" )
 
-# /mnt dizinine girmek
-cd /mnt
-# @ btrfs subvolume oluşturmak
-btrfs su cr @
+# 1. Kök alt birimi geçici olarak bağla ve tüm subvolume'leri oluştur
+mkdir -p /mnt
+mount -t btrfs -o "$OPTS" LABEL="$LABEL" /mnt
 
-# @/var btrfs subvolume oluşturmak
-btrfs su cr @/var
+for sub in "${SUBVOLS[@]}"; do
+    mkdir -p "/mnt/$(dirname "$sub")"
+    btrfs subvolume create "/mnt/$sub"
+done
 
-# @/usr klasörünü oluşturmak
-mkdir @/usr
-
-# @/usr/local subvolume oluşturmak
-btrfs su cr @/usr/local
-
-# @/srv subvolume oluşturmak
-btrfs su cr @/srv
-
-# @/root subvolume oluşturmak
-btrfs su cr @/root
-
-# @/opt subvolume oluşturmak
-btrfs su cr @/opt
-
-# @/tmp subvolume oluşturmak
-btrfs su cr @/tmp
-
-# @/home subvolume oluşturmak
-btrfs su cr @/home
-
-# Ana dizine Dönmek
-cd
-
-# /mnt dizinini btrfs subvolumeleri ve subvolidler ile mount etmek için umount etmek
 umount /mnt
 
-# /mnt dizinini Pacstrap kısmına hazırlamak için subvollerin ve subvolidlerin mount edilmesi
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@ LABEL=ArchLinux /mnt
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/var LABEL=ArchLinux /mnt/var
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/usr/local LABEL=ArchLinux /mnt/usr/local
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/srv LABEL=ArchLinux /mnt/srv
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/root LABEL=ArchLinux /mnt/root
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/opt LABEL=ArchLinux /mnt/opt
-mount -t btrfs -o defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120,subvol=@/home LABEL=ArchLinux /mnt/home
+# 2. Seçilen subvolume'leri ana sisteme bağla
+for sub in "${MOUNT_SUBVOLS[@]}"; do
+    target="/mnt${sub#@}"
+    mkdir -p "$target"
+    mount -t btrfs -o "$OPTS,subvol=$sub" LABEL="$LABEL" "$target"
+done
 
 clear
 show_banner
-# subvolumeleri listelemek
 btrfs su l /mnt
-
-# disk durumunu detaylı bir şekilde göstermek
 lsblk -f
 sleep 1.5
 clear

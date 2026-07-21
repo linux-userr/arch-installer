@@ -12,7 +12,7 @@ while true; do
     echo "Lütfen klavye düzeninizi seçin:"
     echo "1) Türkçe"
     echo "2) İngilizce"
-    read -p "Seçiminizi yapın (1 veya 2): " choice
+    read -r -p "Seçiminizi yapın (1 veya 2): " choice
 
     case $choice in
         1)
@@ -44,7 +44,7 @@ done
 
 # Kullanıcı doğrulaması
 while true; do
-    read -p "Klavye düzeninizin doğru olduğundan emin misiniz? (E/H): " confirm
+    read -r -p "Klavye düzeninizin doğru olduğundan emin misiniz? (E/H): " confirm
 
     case $confirm in
         [Ee])  # E veya e kabul edilir

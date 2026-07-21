@@ -3,13 +3,15 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
+# shellcheck source=/dev/null
 source /run/enc_opt.sh
+: "${encrypt_option:=}"
 
 ucode_package=""
 
 sd_boot_mount_option(){
 	umount -R /boot 2>/dev/null || true
-	rm -rf /boot/*
+	rm -rf /boot/* 2>/dev/null || true
 	mount --mkdir -t vfat -o nodev,nosuid,noexec,fmask=0077,dmask=0077 LABEL=EFI /boot
 	systemctl daemon-reload
 	truncate -s 0 /etc/fstab
