@@ -14,7 +14,7 @@ fi
 LABEL="ArchLinux"
 OPTS="defaults,rw,noatime,compress-force=zstd:2,ssd,discard=async,space_cache=v2,commit=120"
 
-disc_efi(){
+disc_efi() {
     sgdisk --zap-all --clear \
         -n 1:0:+1GiB -c 1:EFI -t 1:ef00 \
         -n 2:0:0 -c 2:ArchLinux -t 2:8300 "$selected_disk"
@@ -25,7 +25,10 @@ disc_efi(){
     root_part=$(blkid -t PARTLABEL="ArchLinux" -o device "$selected_disk"*)
     efi_part=$(blkid -t PARTLABEL="EFI" -o device "$selected_disk"*)
 
-    if [[ -z "$root_part" ]]; then echo "Hata: Root partition bulunamadı!"; exit 1; fi
+    if [[ -z "$root_part" ]]; then
+        echo "Hata: Root partition bulunamadı!"
+        exit 1
+    fi
 
     mkfs.vfat -F32 -n EFI "$efi_part"
     mkfs.btrfs -f -L "$LABEL" "$root_part"
@@ -35,7 +38,7 @@ create_disk_no() {
     echo "$selected_disk$([[ "$selected_disk" == *"nvme"* ]] && echo p)$1"
 }
 
-disc_mbr(){
+disc_mbr() {
     echo -e "o\nn\np\n1\n\n\nw" | fdisk "$selected_disk"
     root_no=1
     mkfs.btrfs -f -L "$LABEL" "$(create_disk_no "$root_no")"
@@ -47,8 +50,8 @@ else
     disc_mbr
 fi
 
-SUBVOLS=( "@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/tmp" "@/home" )
-MOUNT_SUBVOLS=( "@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/home" )
+SUBVOLS=("@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/tmp" "@/home")
+MOUNT_SUBVOLS=("@" "@/var" "@/usr/local" "@/srv" "@/root" "@/opt" "@/home")
 
 # 1. Kök alt birimi geçici olarak bağla ve tüm subvolume'leri oluştur
 mkdir -p /mnt

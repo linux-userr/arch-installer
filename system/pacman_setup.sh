@@ -18,10 +18,12 @@ sed -i '/^\s*#\[multilib\]/ {
   s/^#//
 }' $pacman_conf
 
-
 wait
 # Geri sayım için bir döngü başlat
-for i in {3..1}; do echo -ne "Pacman Konfigüre Ediliyor - Kalan süre: $i\033[0K\r"; sleep 1; done
+for i in {3..1}; do
+    echo -ne "Pacman Konfigüre Ediliyor - Kalan süre: $i\033[0K\r"
+    sleep 1
+done
 clear
 show_banner
 
@@ -29,7 +31,7 @@ show_banner
 echo "Pacman Konfigüre Edildi. "
 sleep 0.5
 clear
-show_banner 
+show_banner
 
 pacman-key --init
 pacman-key --populate

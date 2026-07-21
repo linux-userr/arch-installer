@@ -31,48 +31,51 @@ echo "$disks" | nl -s ') '
 
 # Disk seçimi
 while :; do
-    	read -r -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
-	selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
-	export selected_disk
-	echo "export selected_disk=$selected_disk" > /run/selected_disk.sh
-    	if [[ -n "$selected_disk" ]]; then
-		echo "Seçilen Disk: $selected_disk"
-		break
-    	else
-		sleep 0.5
-		clear
-		show_banner
-		echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
-	fi
+    read -r -p "Kurulum yapmak istediğiniz diski seçin (1-$(echo "$disks" | wc -l)): " selection
+    selected_disk=$(echo "$disks" | awk -v sel="$selection" 'NR==sel {print "/dev/" $1}')
+    export selected_disk
+    echo "export selected_disk=$selected_disk" >/run/selected_disk.sh
+    if [[ -n "$selected_disk" ]]; then
+        echo "Seçilen Disk: $selected_disk"
+        break
+    else
+        sleep 0.5
+        clear
+        show_banner
+        echo "Geçersiz seçim! Lütfen geçerli bir numara girin."
+    fi
 done
 
 # Disk formatlama
 while :; do
     read -r -p "Diski formatlamak istiyor musunuz? (E/H): " format_option
     case "$format_option" in
-        [Ee])
-            echo "Disk formatlama işlemi başlatılıyor..."
-            for i in {3..1}; do echo -ne "Kalan süre: $i\033[0K\r"; sleep 1; done
-            if wipefs -af "$selected_disk"; then
-                echo "Disk başarıyla formatlandı."
-		sleep 1.0
-		clear
-            else
-                hata_mesaji "Disk formatlama başarısız oldu!"
-            fi
-            break
-            ;;
-        [Hh])
-            echo "Disk formatlama işlemi iptal edildi."
-            exit 42 
-            ;;
-        *)
-	    echo "Seçilen Disk: $selected_disk"
-            echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
-	    sleep 1.5
-	    clear
-	    show_banner
-            ;;
+    [Ee])
+        echo "Disk formatlama işlemi başlatılıyor..."
+        for i in {3..1}; do
+            echo -ne "Kalan süre: $i\033[0K\r"
+            sleep 1
+        done
+        if wipefs -af "$selected_disk"; then
+            echo "Disk başarıyla formatlandı."
+            sleep 1.0
+            clear
+        else
+            hata_mesaji "Disk formatlama başarısız oldu!"
+        fi
+        break
+        ;;
+    [Hh])
+        echo "Disk formatlama işlemi iptal edildi."
+        exit 42
+        ;;
+    *)
+        echo "Seçilen Disk: $selected_disk"
+        echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
+        sleep 1.5
+        clear
+        show_banner
+        ;;
     esac
 done
 
@@ -83,32 +86,31 @@ while :; do
     read -r -p "Diski şifrelemek istiyor musunuz? (E/H): " encrypt_option
     encrypt_option=${encrypt_option,,}
     case "$encrypt_option" in
-        e)
-            echo "Disk şifreleme seçildi. Şifreleme işlemi başlıyor..."
-            export selected_disk
-	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
-	    # shellcheck source=/dev/null
-	    source "${DISK_DIR}/disk_luks.sh" "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!" 
-            break
-            ;;
-        h)
-            echo "Şifreleme seçilmedi. Devam ediliyor..."
-            export selected_disk
-	    export encrypt_option
-	    echo "export encrypt_option=$encrypt_option" > /run/enc_opt.sh
-	    # shellcheck source=/dev/null
-	    source "${DISK_DIR}/disk_plain.sh" "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
-            break
-            ;;
-        *)
-	    echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
-	    sleep 1.5
-	    clear
-	    show_banner
-            ;;
+    e)
+        echo "Disk şifreleme seçildi. Şifreleme işlemi başlıyor..."
+        export selected_disk
+        export encrypt_option
+        echo "export encrypt_option=$encrypt_option" >/run/enc_opt.sh
+        # shellcheck source=/dev/null
+        source "${DISK_DIR}/disk_luks.sh" "$selected_disk" || hata_mesaji "Şifreleme işlemi başarısız oldu!"
+        break
+        ;;
+    h)
+        echo "Şifreleme seçilmedi. Devam ediliyor..."
+        export selected_disk
+        export encrypt_option
+        echo "export encrypt_option=$encrypt_option" >/run/enc_opt.sh
+        # shellcheck source=/dev/null
+        source "${DISK_DIR}/disk_plain.sh" "$selected_disk" || hata_mesaji "Şifresiz işlem başarısız oldu!"
+        break
+        ;;
+    *)
+        echo "Geçersiz giriş! Lütfen 'E' veya 'H' girin."
+        sleep 1.5
+        clear
+        show_banner
+        ;;
     esac
 done
 
 chmod 600 /run/selected_disk.sh /run/enc_opt.sh
-

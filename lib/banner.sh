@@ -10,7 +10,7 @@ GRAY="\033[1;90m"
 RESET="\033[0m"
 
 echo -e "${BLUE}"
-cat << "EOF"
+cat <<"EOF"
  █████╗ ██████╗  ██████╗██╗  ██╗    ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
 ██╔══██╗██╔══██╗██╔════╝██║  ██║    ██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
 ███████║██████╔╝██║     ███████║    ██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝ 
@@ -20,10 +20,9 @@ cat << "EOF"
 EOF
 
 echo -e "${GRAY}"
-cat << "EOF"
+cat <<"EOF"
                 Arch Linux Automatic Installer
                 Minimal · Clean · Reliable
 EOF
 
 echo -e "${RESET}"
-

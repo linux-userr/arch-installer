@@ -3,7 +3,10 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 
-[[ "$-" == *x* ]] && { echo "Hata: Bu script debug modunda (-x) çalıştırılamaz, şifreler açığa çıkabilir!" >&2; exit 1; }
+[[ "$-" == *x* ]] && {
+    echo "Hata: Bu script debug modunda (-x) çalıştırılamaz, şifreler açığa çıkabilir!" >&2
+    exit 1
+}
 
 setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 

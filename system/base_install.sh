@@ -15,8 +15,7 @@ cp /etc/pacman.conf.bck /mnt/etc/pacman.conf.bck
 
 cp /etc/mkinitcpio.conf /mnt/etc/mkinitcpio.bck
 
-genfstab -LUp /mnt >> /mnt/etc/fstab
-
+genfstab -LUp /mnt >>/mnt/etc/fstab
 
 cp "${LIB_DIR}/banner.sh" /mnt/bin/
 cp "${SYSTEM_DIR}/chroot_setup.sh" /mnt/bin/

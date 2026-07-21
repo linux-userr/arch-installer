@@ -4,7 +4,7 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 
 # Ana dizini BİR KEZ bulup export ediyoruz
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 export SCRIPT_DIR
 
 # Modül yollarını export ediyoruz (Alt scriptler bunları doğrudan görecek)

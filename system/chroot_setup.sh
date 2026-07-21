@@ -11,7 +11,7 @@ setfont /usr/share/kbd/consolefonts/ter-v16b.psf.gz
 
 # Başlamadan önce internet bağlantısını kontrol et
 check_internet() {
-    if ! curl -s --head https://google.com > /dev/null; then
+    if ! curl -s --head https://google.com >/dev/null; then
         echo "Hata: İnternet bağlantısı yok! Lütfen ağınızı kontrol edin."
         exit 1
     fi
@@ -53,9 +53,9 @@ while true; do
     fi
 done
 
-echo "$new_hostname" > /etc/hostname
+echo "$new_hostname" >/etc/hostname
 
-cat <<EOF > /etc/hosts
+cat <<EOF >/etc/hosts
 127.0.0.1   localhost
 ::1         localhost
 127.0.0.1   $new_hostname.localdomain $new_hostname
@@ -69,7 +69,7 @@ echo ">> Yerel ayarlar yapılandırılıyor (en_US.UTF-8)..."
 # Mevcut satırı güvenli bir şekilde yorumdan çıkar
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "LANG=en_US.UTF-8" >/etc/locale.conf
 
 # --- 4. Paket Yöneticisi ve Depolar ---
 echo ">> Pacman anahtarları hazırlanıyor..."
@@ -90,7 +90,7 @@ pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
 pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' --noconfirm
 
 if ! grep -q "\[chaotic-aur\]" /etc/pacman.conf; then
-    cat <<EOF >> /etc/pacman.conf
+    cat <<EOF >>/etc/pacman.conf
 
 [chaotic-aur]
 Include = /etc/pacman.d/chaotic-mirrorlist
